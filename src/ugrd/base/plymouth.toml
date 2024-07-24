@@ -1,16 +1,10 @@
 
-binaries = ['plymouthd', 'plymouth']
+binaries = ['plymouthd', 'plymouth', 'plymouth-set-default-theme']
 
 paths = ['/run/plymouth']
 
-[mounts.devpts]
-type = "devpts"
-destination = "/dev/pts"
-source = "/dev/pts"
-remake_mountpoint = true
-
 [imports.build_pre]
-"ugrd.base.plymouth" = [ "populate_initrd" ]
+"ugrd.base.plymouth" = [ "prepare_files" ]
 
 [imports.init_main]
 "ugrd.base.plymouth" = [ "start_plymouth" ]

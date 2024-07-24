@@ -100,7 +100,9 @@ class GeneratorHelpers:
 
     def _copy(self, source: Union[Path, str], dest=None) -> None:
         """ Copies a file, chowns it as self['_file_owner_uid'] """
+        from shutil import copytree
         from shutil import copy2
+        from os.path import isdir
 
         if not isinstance(source, Path):
             source = Path(source)
@@ -121,8 +123,12 @@ class GeneratorHelpers:
             self.logger.debug("Destination is a directory, adding source filename: %s" % source.name)
             dest_path = dest_path / source.name
 
-        self.logger.log(self['_build_log_level'], "Copying '%s' to '%s'" % (source, dest_path))
-        copy2(source, dest_path)
+        if isdir(source):
+            self.logger.log(self['_build_log_level'], "Copying directory '%s' to '%s'" % (source, dest_path))
+            copytree(source, dest_path)
+        else:
+            self.logger.log(self['_build_log_level'], "Copying file '%s' to '%s'" % (source, dest_path))
+            copy2(source, dest_path)
 
         self._chown(dest_path)
 
