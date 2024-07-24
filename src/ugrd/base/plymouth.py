@@ -1,5 +1,14 @@
 def prepare_files(self):
-    import os
+    from os.path import exists
+    if exists("/etc/kernel/cmdline"):
+        cmdline_file="/etc/kernel/cmdline"
+    elif exists("/etc/kernel/uefi-mkconfig"):
+        cmdline_file="/etc/kernel/uefi-mkconfig"
+    else:
+        cmdline_file="/proc/cmdline"
+    f = open(cmdline_file, 'r').read()
+    if not ('quiet' in f and 'splash' in f):
+        raise ValueError('cmdline is missing "splash quiet" parameters, they are important for plymouth')
     for line in open("/etc/plymouth/plymouthd.conf", 'r').readlines():
         if line.find('Theme') != -1:
             theme = "/usr/share/plymouth/themes/" + line.removeprefix('Theme=').strip('\n')
