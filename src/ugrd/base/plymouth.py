@@ -1,14 +1,14 @@
-def prepare_files(self):
-    from os.path import exists
-    if exists("/etc/kernel/cmdline"):
-        cmdline_file="/etc/kernel/cmdline"
-    elif exists("/etc/kernel/uefi-mkconfig"):
-        cmdline_file="/etc/kernel/uefi-mkconfig"
-    else:
-        cmdline_file="/proc/cmdline"
-    f = open(cmdline_file, 'r').read()
+from zenlib.util import contains
+
+@contains('validate', "validate is not enabled, skipping cmdline validation.")
+def _validate_cmdline(self) -> None:
+    f = open("/proc/cmdline", 'r').read()
     if not ('quiet' in f and 'splash' in f):
-        raise ValueError('cmdline is missing "splash quiet" parameters, they are important for plymouth')
+        self.logger.warning('current cmdline is missing "splash quiet" parameters, they are important for plymouth to work')
+
+    
+def prepare_files(self):
+    _validate_cmdline(self)
     for line in open("/etc/plymouth/plymouthd.conf", 'r').readlines():
         if line.find('Theme') != -1:
             theme = "/usr/share/plymouth/themes/" + line.removeprefix('Theme=').strip('\n')
