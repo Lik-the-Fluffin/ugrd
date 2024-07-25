@@ -8,11 +8,14 @@ def _validate_cmdline(self) -> None:
 
     
 def prepare_files(self):
-    _validate_cmdline(self)
+    from os.path import join
+    from os import walk
     for line in open("/etc/plymouth/plymouthd.conf", 'r').readlines():
         if line.find('Theme') != -1:
             theme = "/usr/share/plymouth/themes/" + line.removeprefix('Theme=').strip('\n')
-    self['dependencies'] = [theme, '/usr/lib64/plymouth/', '/etc/plymouth/plymouthd.conf', '/usr/share/plymouth/themes/text/text.plymouth', '/usr/share/plymouth/themes/details/details.plymouth']
+    dir_list = [theme, '/usr/lib64/plymouth/', '/etc/plymouth/plymouthd.conf', '/usr/share/plymouth/themes/text/text.plymouth', '/usr/share/plymouth/themes/details/details.plymouth']
+    for dir_path in dir_list:
+        self['dependencies'] = self['dependencies'] + [join(dirpath,f) for (dirpath, dirnames, filenames) in walk(dir_path) for f in filenames]
 
 
 def start_plymouth(self):
