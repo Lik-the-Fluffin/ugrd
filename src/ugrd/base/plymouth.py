@@ -17,7 +17,7 @@ def prepare_files(self):
     for dir_path in dir_list:
         depend = depend + [join(dirpath,f) for (dirpath, dirnames, filenames) in walk(dir_path) for f in filenames]
     self['dependencies'] = depend
-    print(depend)
+    self.logger.info("Included plymouth files: %s" % depend)
 
 def start_plymouth(self):
     """
